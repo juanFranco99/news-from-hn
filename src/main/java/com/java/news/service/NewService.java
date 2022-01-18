@@ -18,13 +18,16 @@ import java.util.Scanner;
 @Service
 public class NewService {
 
-    public List<New> getAll() throws IOException, ParseException {
+    public List<New> getAllJava() throws IOException, ParseException {
+        return getByQuery("java");
+    }
 
+    public List<New> getByQuery(String query) throws IOException, ParseException {
         List<New> news = new ArrayList<>();
 
-        URL url = new URL("https://hn.algolia.com/api/v1/search_by_date?query=java");
+        var url = new URL("https://hn.algolia.com/api/v1/search_by_date?query="+query);
 
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        var conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.connect();
 
@@ -35,8 +38,8 @@ public class NewService {
             throw new RuntimeException("HttpResponseCode: " + responsecode);
         } else {
 
-            StringBuilder inline = new StringBuilder();
-            Scanner scanner = new Scanner(url.openStream());
+            var inline = new StringBuilder();
+            var scanner = new Scanner(url.openStream());
 
             //Cargando todo el contenido del json en un un string builder usando el scanner
             while (scanner.hasNext()) {
@@ -45,19 +48,19 @@ public class NewService {
             scanner.close();
 
             //Carga el contenido en un json
-            JSONParser parse = new JSONParser();
-            JSONObject data_obj = (JSONObject) parse.parse(inline.toString());
+            var parse = new JSONParser();
+            var data_obj = (JSONObject) parse.parse(inline.toString());
 
             //objentiendo la propieda "hits" que es donde se encuentran los datos
-            JSONArray arr = (JSONArray) data_obj.get("hits");
+            var arr = (JSONArray) data_obj.get("hits");
 
             //recorriendo el objeto para cargar los datos
             for (Object o : arr) {
 
-                JSONObject new_obj = (JSONObject) o;
+                var new_obj = (JSONObject) o;
                 //usando gson para parsear los datos a la clase creada
-                Gson gson= new Gson();
-                New obj = gson.fromJson(new_obj.toString(),New.class);
+                var gson = new Gson();
+                var obj = gson.fromJson(new_obj.toString(),New.class);
                 news.add(obj);
             }
         }
